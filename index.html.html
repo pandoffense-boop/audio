@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast Educativo - Evaluación Alternativa 2026 | Policía Nacional del Ecuador</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        police: {
+                            50: '#f0f4f8',
+                            100: '#d9e2ec',
+                            500: '#1b365d',
+                            600: '#0f2545',
+                            700: '#0a192f',
+                            800: '#06101e',
+                            gold: '#d4af37',
+                            goldHover: '#b89628'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #06101e;
+            color: #e2e8f0;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f2545;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e3a8a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4af37;
+        }
+        .reading-active {
+            background-color: rgba(212, 175, 55, 0.15) !important;
+            border-left: 4px solid #d4af37 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateX(4px);
+            transition: all 0.3s ease;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 0.4; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        .audio-wave-active {
+            animation: pulse-ring 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-police-800 text-slate-100 antialiased selection:bg-police-gold selection:text-police-800">
+
+    <!-- HEADER INSTITUCIONAL -->
+    <header class="bg-police-700 border-b border-police-500/40 sticky top-0 z-40 shadow-xl backdrop-blur-md bg-opacity-95">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3.5">
+                <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-police-gold to-yellow-200 flex items-center justify-center shadow-lg shadow-police-gold/20 text-police-800 font-bold text-xl border-2 border-police-gold">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-extrabold text-white tracking-wide leading-snug">
+                        POLICÍA NACIONAL DEL ECUADOR
+                    </h1>
+                    <p class="text-xs text-police-gold font-medium flex items-center gap-1.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Dirección Nacional de Educación &bull; DAEF &bull; Módulo 2026
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button id="btnBookmark" onclick="toggleBookmarkCurrent()" class="px-3 py-1.5 rounded-lg bg-police-600 hover:bg-police-500 text-xs font-semibold text-slate-200 flex items-center gap-2 transition border border-police-500/30">
+                    <i class="fa-regular fa-bookmark text-police-gold"></i>
+                    <span class="hidden sm:inline">Guardar Marcador</span>
+                </button>
+                <button onclick="openQuizModal()" class="px-3 py-1.5 rounded-lg bg-police-gold hover:bg-police-goldHover text-police-800 font-bold text-xs flex items-center gap-2 shadow-md transition">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Autoevaluación</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- REPRODUCTOR PRINCIPAL Y CONTENIDO -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- COLUMNA IZQUIERDA: AUDIO Y CONTROLES -->
+        <aside class="lg:col-span-4 flex flex-col gap-6">
+            
+            <div class="bg-gradient-to-b from-police-700 to-police-600 rounded-2xl p-6 border border-police-500/40 shadow-2xl relative overflow-hidden">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-police-gold/10 rounded-full blur-2xl"></div>
+                
+                <div class="flex flex-col items-center text-center mb-5">
+                    <div class="relative group mb-3">
+                        <div id="artRing" class="w-28 h-28 rounded-2xl bg-gradient-to-br from-police-500 to-police-800 border-2 border-police-gold/50 flex items-center justify-center shadow-xl p-3 transition-all duration-300">
+                            <i id="audioStatusIcon" class="fa-solid fa-podcast text-4xl text-police-gold"></i>
+                        </div>
+                        <span class="absolute bottom-1 right-1 bg-police-gold text-police-800 text-[10px] font-black px-2 py-0.5 rounded-full shadow">
+                            AUDIOBOOK
+                        </span>
+                    </div>
+                    <h2 id="playerChapterTitle" class="text-base font-bold text-white line-clamp-1">
+                        Cargando módulo...
+                    </h2>
+                    <p id="playerSubtitle" class="text-xs text-slate-300 mt-1">
+                        Profesor Evaluador &bull; Voz Académica
+                    </p>
+                </div>
+
+                <!-- Barra de Progreso y Tiempo -->
+                <div class="space-y-1.5 mb-5">
+                    <div class="flex justify-between text-xs font-mono text-slate-300">
+                        <span id="currentTimeDisplay">00:00</span>
+                        <span id="totalTimeDisplay">00:00</span>
+                    </div>
+                    <div class="relative w-full h-2.5 bg-police-800 rounded-full overflow-hidden cursor-pointer group" id="progressBarContainer" onclick="seekByClick(event)">
+                        <div id="progressBar" class="h-full bg-gradient-to-r from-yellow-500 to-police-gold w-0 transition-all duration-200"></div>
+                    </div>
+                </div>
+
+                <!-- Controles de Reproducción -->
+                <div class="flex items-center justify-center gap-3 sm:gap-4 mb-5">
+                    <button onclick="skipTime(-10)" title="Retroceder 10s" class="w-10 h-10 rounded-full bg-police-800/80 hover:bg-police-500 text-slate-200 flex items-center justify-center transition border border-police-500/30 active:scale-95">
+                        <i class="fa-solid fa-rotate-left text-sm"></i>
+                    </button>
+
+                    <button onclick="changeChapter(currentChapterIndex - 1)" title="Anterior" class="w-10 h-10 rounded-full bg-police-800/80 hover:bg-police-500 text-slate-200 flex items-center justify-center transition border border-police-500/30 active:scale-95">
+                        <i class="fa-solid fa-backward-step text-sm"></i>
+                    </button>
+
+                    <button id="btnPlayPause" onclick="togglePlayPause()" title="Play / Pausa" class="w-14 h-14 rounded-full bg-gradient-to-tr from-police-gold to-yellow-300 hover:from-yellow-400 hover:to-police-gold text-police-800 flex items-center justify-center shadow-lg shadow-police-gold/30 transition-all transform active:scale-90 font-bold text-xl">
+                        <i id="playIcon" class="fa-solid fa-play ml-0.5"></i>
+                    </button>
+
+                    <button onclick="stopAudio()" title="Detener" class="w-10 h-10 rounded-full bg-police-800/80 hover:bg-red-500/20 text-slate-200 hover:text-red-400 flex items-center justify-center transition border border-police-500/30 active:scale-95">
+                        <i class="fa-solid fa-stop text-sm"></i>
+                    </button>
+
+                    <button onclick="changeChapter(currentChapterIndex + 1)" title="Siguiente" class="w-10 h-10 rounded-full bg-police-800/80 hover:bg-police-500 text-slate-200 flex items-center justify-center transition border border-police-500/30 active:scale-95">
+                        <i class="fa-solid fa-forward-step text-sm"></i>
+                    </button>
+
+                    <button onclick="skipTime(10)" title="Adelantar 10s" class="w-10 h-10 rounded-full bg-police-800/80 hover:bg-police-500 text-slate-200 flex items-center justify-center transition border border-police-500/30 active:scale-95">
+                        <i class="fa-solid fa-rotate-right text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Opciones de Velocidad y Voz -->
+                <div class="grid grid-cols-2 gap-3 pt-3 border-t border-police-500/30 text-xs">
+                    <div>
+                        <label class="block text-slate-400 font-medium mb-1 flex items-center gap-1">
+                            <i class="fa-solid fa-gauge-high text-police-gold"></i> Velocidad
+                        </label>
+                        <select id="speedSelect" onchange="setPlaybackRate(this.value)" class="w-full bg-police-800 border border-police-500/50 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-police-gold font-mono">
+                            <option value="0.8">0.8x (Lento)</option>
+                            <option value="1.0" selected>1.0x (Normal)</option>
+                            <option value="1.25">1.25x (Rápido)</option>
+                            <option value="1.5">1.5x (Repaso)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-400 font-medium mb-1 flex items-center gap-1">
+                            <i class="fa-solid fa-user-gear text-police-gold"></i> Voz Lectora
+                        </label>
+                        <select id="voiceSelect" onchange="changeVoice()" class="w-full bg-police-800 border border-police-500/50 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-police-gold truncate">
+                            <option value="">Cargando voces...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ÍNDICE DE CAPÍTULOS -->
+            <div class="bg-police-700/80 rounded-2xl p-5 border border-police-500/30 shadow-xl flex flex-col flex-1">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center justify-between">
+                    <span><i class="fa-solid fa-list-ol text-police-gold mr-2"></i>Índice del Módulo</span>
+                    <span class="text-[11px] bg-police-600 text-police-gold px-2 py-0.5 rounded-full border border-police-500/30">5 Unidades</span>
+                </h3>
+
+                <div id="chapterListContainer" class="space-y-2 overflow-y-auto max-h-[380px] pr-1">
+                    <!-- Generado por JS -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- COLUMNA DERECHA: TRANCRIPCIÓN Y LECTURA -->
+        <section class="lg:col-span-8 flex flex-col gap-4">
+            
+            <div class="bg-police-700/90 rounded-2xl p-4 border border-police-500/30 shadow-lg flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <span class="text-xs text-police-gold uppercase font-semibold tracking-wider block">Transcripción Explicativa</span>
+                    <h2 id="currentChapterHeading" class="text-lg font-bold text-white">
+                        Cargando módulo...
+                    </h2>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="setFontSize(1)" title="Aumentar fuente" class="w-8 h-8 rounded-lg bg-police-600 hover:bg-police-500 text-slate-200 flex items-center justify-center transition border border-police-500/30">
+                        <i class="fa-solid fa-font text-xs"></i><i class="fa-solid fa-plus text-[9px] -ml-0.5"></i>
+                    </button>
+                    <button onclick="setFontSize(-1)" title="Disminuir fuente" class="w-8 h-8 rounded-lg bg-police-600 hover:bg-police-500 text-slate-200 flex items-center justify-center transition border border-police-500/30">
+                        <i class="fa-solid fa-font text-xs"></i><i class="fa-solid fa-minus text-[9px] -ml-0.5"></i>
+                    </button>
+                    <button onclick="copyTranscriptText()" title="Copiar transcripción" class="px-3 py-1.5 rounded-lg bg-police-600 hover:bg-police-500 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition border border-police-500/30">
+                        <i class="fa-regular fa-copy text-police-gold"></i>
+                        <span class="hidden sm:inline">Copiar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ÁREA DE TEXTO SINCRONIZADO -->
+            <div id="transcriptViewport" class="bg-police-700/40 rounded-2xl p-6 border border-police-500/20 shadow-xl min-h-[480px] max-h-[620px] overflow-y-auto space-y-4 text-slate-300 leading-relaxed text-sm sm:text-base transition-all">
+                <!-- Párrafos cargados por JS -->
+            </div>
+
+            <!-- TARJETAS RÁPIDAS DE ESTUDIO -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="bg-police-700/60 p-3 rounded-xl border border-police-500/20 text-center">
+                    <span class="block text-[10px] text-slate-400 uppercase">Mínimo Aprobación</span>
+                    <span class="text-sm font-extrabold text-emerald-400">15/20 pts</span>
+                </div>
+                <div class="bg-police-700/60 p-3 rounded-xl border border-police-500/20 text-center">
+                    <span class="block text-[10px] text-slate-400 uppercase">Base Legal</span>
+                    <span class="text-sm font-extrabold text-police-gold">Acuerdo 0159</span>
+                </div>
+                <div class="bg-police-700/60 p-3 rounded-xl border border-police-500/20 text-center">
+                    <span class="block text-[10px] text-slate-400 uppercase">Pirámide 2026</span>
+                    <span class="text-sm font-extrabold text-cyan-400">Proteína / Fibra</span>
+                </div>
+                <div class="bg-police-700/60 p-3 rounded-xl border border-police-500/20 text-center">
+                    <span class="block text-[10px] text-slate-400 uppercase">Primeros Auxilios</span>
+                    <span class="text-sm font-extrabold text-amber-400">Método R.I.C.E.</span>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- MODAL DE AUTOEVALUACIÓN -->
+    <div id="quickQuizModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-police-700 border border-police-gold/40 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative text-slate-100">
+            <button onclick="closeQuizModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div class="flex items-center gap-2 mb-4">
+                <div class="w-8 h-8 rounded-lg bg-police-gold text-police-800 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-file-pen"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white">Autoevaluación de Conocimientos</h3>
+            </div>
+
+            <div id="quizContent" class="space-y-4">
+                <p id="quizQuestion" class="text-sm font-semibold text-slate-200">
+                    Pregunta...
+                </p>
+                <div id="quizOptions" class="space-y-2 text-xs sm:text-sm">
+                    <!-- Opciones por JS -->
+                </div>
+                <div id="quizFeedback" class="hidden p-3 rounded-lg text-xs font-medium"></div>
+            </div>
+
+            <div class="mt-6 flex justify-between items-center pt-3 border-t border-police-500/30">
+                <span id="quizScoreTracker" class="text-xs text-slate-400">Pregunta <span id="currentQNum">1</span> de 4</span>
+                <button id="btnNextQuiz" onclick="nextQuizQuestion()" class="px-4 py-2 bg-police-gold hover:bg-police-goldHover text-police-800 font-bold rounded-lg text-xs transition">
+                    Siguiente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIONES TOAST -->
+    <div id="toastNotification" class="fixed bottom-5 right-5 bg-police-gold text-police-800 font-bold px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 text-xs transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <i id="toastIcon" class="fa-solid fa-circle-check"></i>
+        <span id="toastMessage">Notificación</span>
+    </div>
+
+    <!-- LÓGICA DE SÍNTESIS DE VOZ Y NAVEGACIÓN -->
+    <script>
+        const moduleChapters = [
+            {
+                id: 0,
+                title: "Introducción y Marco Normativo",
+                subtitle: "Acuerdo Ministerial Nro. 0159 & Alcance Institucional",
+                durationSec: 145,
+                paragraphs: [
+                    "Bienvenidos y bienvenidas a esta lección explicativa sobre el Módulo de Estudio de Evaluación Alternativa a la Evaluación Física 2026, avalado por el Instituto Superior Tecnológico de la Policía Nacional.",
+                    "Este módulo surge como una solución inclusiva e institucional diseñada para las y los servidores policiales que, por condiciones médicas justificadas, estado de gestación, periodo de lactancia, o por estar asignados en comisiones internacionales, no pueden rendir las pruebas físicas convencionales.",
+                    "El marco normativo está regulado en el Reglamento expedido mediante Acuerdo Ministerial Número 0159 de fecha 22 de noviembre de 2023.",
+                    "Nuestro objetivo académico es revisar de manera integral las cinco unidades temáticas para garantizar su preparación y actualización de conocimientos."
+                ]
+            },
+            {
+                id: 1,
+                title: "Unidad I: Fundamentos de Actividad Física y Deporte",
+                subtitle: "Conceptos Clave & Clasificación de Parlebas",
+                durationSec: 210,
+                paragraphs: [
+                    "Comenzamos la Unidad I marcando las diferencias conceptuales fundamentales que con frecuencia se confunden en la práctica diaria.",
+                    "1) Actividad Física: Según la Organización Mundial de la Salud, es todo movimiento corporal producido por los músculos esqueléticos que requiere consumo de energía. Incluye desplazamientos y tareas cotidianas.",
+                    "2) Ejercicio Físico: Corresponde a movimientos planificados, estructurados y repetitivos cuyo objetivo explícito es mejorar o mantener la condición física.",
+                    "3) Acondicionamiento y Preparación Física: Es el proceso sistemático de entrenamiento orientado a llevar el potencial funcional y las cualidades físicas a niveles óptimos.",
+                    "4) Deporte: Es una actividad física reglamentada y competitiva. Según Parlebas, los deportes se clasifican en Individuales, de Adversario y Colectivos.",
+                    "No debemos olvidar la Recreación, que contribuye al desarrollo humano integral mediante el aprovechamiento saludable del tiempo libre."
+                ]
+            },
+            {
+                id: 2,
+                title: "Unidad II: Capacidades Físicas y Fisiología",
+                subtitle: "Sistemas Energéticos, Fibras Musculares y Frecuencia Cardíaca",
+                durationSec: 260,
+                paragraphs: [
+                    "En la Unidad II abordamos el funcionamiento fisiológico del organismo durante el esfuerzo físico.",
+                    "Las capacidades físicas se clasifican en Condicionales (Fuerza, Velocidad, Resistencia y Flexibilidad) y Coordinativas (Diferenciación, Sincronización, Orientación, Equilibrio y Ritmo).",
+                    "A nivel muscular, el tejido esquelético cuenta con Fibras Rojas Tipo I (de contracción lenta y muy resistentes a la fatiga) y Fibras Blancas Tipo II (de contracción rápida, potentes pero fácilmente fatigables).",
+                    "El Sistema Cardiovascular regula la Frecuencia Cardíaca. Para calcular la Frecuencia Cardíaca Máxima teórica en población general se emplea la fórmula: 220 menos la edad en hombres, y 226 menos la edad en mujeres.",
+                    "Los Sistemas Energéticos para la obtención de ATP son tres: el Sistema ATP-PCr o Anaeróbico Aláctico (esfuerzos explosivos de hasta 10 segundos), el Sistema Glucolítico Anaeróbico Láctico (de 10 segundos a 1 minuto) y el Sistema Oxidativo Aeróbico (para esfuerzos de larga duración)."
+                ]
+            },
+            {
+                id: 3,
+                title: "Unidad III: Composición Corporal y Evaluaciones Policiales",
+                subtitle: "Pista de Destrezas, Test Físicos y Senior Fitness Test",
+                durationSec: 280,
+                paragraphs: [
+                    "En la Unidad III analizamos la composición corporal a través del Índice de Cintura Cadera (ICC) y el Índice de Masa Corporal (IMC). Toda sesión de entrenamiento debe constar de 3 fases: Calentamiento (10 min), Parte Principal (35 min) y Vuelta a la calma (5 min).",
+                    "La Pista de Habilidades y Destrezas Policiales aplica para los grados de Policía a Sargento Segundo, y de Subteniente a Capitán. Evalúa maniobras reales como salida de persecución, evasión de peatones, rescate de víctima, RCP y control del arma.",
+                    "Las Evaluaciones Convencionales aplican para grados superiores (Sargento Primero a Suboficial Mayor, y Mayor a General Superior). Comprenden abdominales, dominadas o suspensión isométrica, velocidad en 60 metros, la Milla (1609m) y natación de 50 metros.",
+                    "Para servidores mayores de 65 años se utiliza el Senior Fitness Test. La nota mínima para ser declarado APTO en evaluaciones periódicas o ascensos es de 15 sobre 20 puntos."
+                ]
+            },
+            {
+                id: 4,
+                title: "Unidad IV: Salud, Pausas Activas y Lesiones",
+                subtitle: "Prevención en la jornada laboral & Protocolo R.I.C.E.",
+                durationSec: 190,
+                paragraphs: [
+                    "La Unidad IV profundiza en la salud laboral y la prevención de trastornos musculoesqueléticos.",
+                    "Las Pausas Activas son breves descansos en la jornada laboral que rompen el sedentarismo, liberan tensión muscular, reducen el estrés y reoxigenar el cerebro para mejorar la atención.",
+                    "Las lesiones deportivas afectan el sistema musculoesquelético (esguinces, distensiones, tendinitis, dislocaciones o fracturas).",
+                    "Ante una lesión aguda, el protocolo inicial de primeros auxilios es el método H.I.C.E.R. o R.I.C.E.: Reposo, Hielo, Compresión y Elevación, debiendo acudir inmediatamente a valoración médica especializada."
+                ]
+            },
+            {
+                id: 5,
+                title: "Unidad V: Nutrición e Hidratación",
+                subtitle: "Nutrientes y la Pirámide Nutricional Invertida 2026",
+                durationSec: 220,
+                paragraphs: [
+                    "En la Unidad V abordamos la nutrición como pilar fundamental del rendimiento y la salud integral.",
+                    "Es esencial diferenciar Alimentación (acto voluntario y consciente de ingerir alimentos) de Nutrición (proceso biológico involuntario de asimilación celular).",
+                    "Los nutrientes se dividen en Macronutrientes (Carbohidratos con 4 kcal/g, Proteínas con 4 kcal/g y Grasas con 9 kcal/g) y Micronutrientes (Vitaminas y Minerales).",
+                    "Nos alineamos a las nuevas guías nutricionales de la Pirámide Invertida 2026, las cuales otorgan prioridad en la cúspide al consumo de proteínas de alta calidad, frutas y verduras enteras, reduciendo carbohidratos refinados y eliminando ultraprocesados y azúcares añadidos."
+                ]
+            }
+        ];
+
+        const quizQuestions = [
+            {
+                q: "¿Cuál es el puntaje mínimo requerido para ser considerado APTO en las evaluaciones físicas anuales o procesos de ascenso?",
+                options: ["12 / 20 puntos", "14 / 20 puntos", "15 / 20 puntos", "17 / 20 puntos"],
+                correct: 2,
+                explanation: "El Artículo 45 del Reglamento de Acondicionamiento Físico fija un mínimo de 15/20 puntos."
+            },
+            {
+                q: "¿Qué sistema energético provee energía ultrarrápida en actividades de máxima intensidad de hasta 10 segundos?",
+                options: ["Sistema Oxidativo Aeróbico", "Sistema ATP-PCr / Anaeróbico Aláctico", "Sistema Glucolítico Láctico", "Sistema Lipolítico"],
+                correct: 1,
+                explanation: "El sistema ATP-PCr actúa de forma inmediata utilizando fosfocreatina sin producir ácido láctico inicial."
+            },
+            {
+                q: "¿Qué significan las siglas del protocolo de tratamiento de lesiones R.I.C.E.?",
+                options: ["Rehabilitación, Inmovilización, Calor, Ejercicio", "Reposo, Hielo, Compresión, Elevación", "Respiración, Inhalación, Calentamiento, Estiramiento", "Riesgo, Inspección, Cirugía, Evaluación"],
+                correct: 1,
+                explanation: "R.I.C.E. corresponde a Rest (Reposo), Ice (Hielo), Compression (Compresión) y Elevation (Elevación)."
+            },
+            {
+                q: "¿Cuál es la recomendación prioritaria de la Pirámide Nutricional Invertida 2026?",
+                options: ["Harinas refinadas y azúcares", "Proteínas de calidad, Frutas y Verduras enteras", "Suplementación exclusiva", "Jugos colados con azúcar"],
+                correct: 1,
+                explanation: "La Pirámide 2026 prioriza proteínas de alto valor biológico y alimentos integrales ricos en fibra y nutrientes."
+            }
+        ];
+
+        // Estado Global
+        let currentChapterIndex = 0;
+        let currentParagraphIndex = 0;
+        let isPlaying = false;
+        let playbackRate = 1.0;
+        let speechSynth = window.speechSynthesis;
+        let currentUtterance = null;
+        let voices = [];
+        let selectedVoice = null;
+        let textFontSize = 16;
+        let progressTimer = null;
+        let chapterElapsedTime = 0;
+        let quizCurrentIndex = 0;
+        let quizScore = 0;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderChapterList();
+            loadChapter(0, false);
+            initVoiceSelector();
+            
+            if (speechSynth.onvoiceschanged !== undefined) {
+                speechSynth.onvoiceschanged = initVoiceSelector;
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SELECT') {
+                    e.preventDefault();
+                    togglePlayPause();
+                } else if (e.code === 'ArrowRight') {
+                    skipTime(10);
+                } else if (e.code === 'ArrowLeft') {
+                    skipTime(-10);
+                }
+            });
+        });
+
+        function initVoiceSelector() {
+            voices = speechSynth.getVoices().filter(v => v.lang.includes('es'));
+            const voiceSelect = document.getElementById('voiceSelect');
+            voiceSelect.innerHTML = '';
+
+            if (voices.length === 0) {
+                const option = document.createElement('option');
+                option.textContent = 'Voz predeterminada (Español)';
+                option.value = '';
+                voiceSelect.appendChild(option);
+                return;
+            }
+
+            voices.forEach((voice, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${voice.name} (${voice.lang})`;
+                if (voice.default || voice.name.includes('Google') || voice.name.includes('Sabina') || voice.name.includes('Jorge') || voice.name.includes('Helena')) {
+                    option.selected = true;
+                    selectedVoice = voice;
+                }
+                voiceSelect.appendChild(option);
+            });
+
+            if (!selectedVoice && voices.length > 0) {
+                selectedVoice = voices[0];
+            }
+        }
+
+        function changeVoice() {
+            const index = document.getElementById('voiceSelect').value;
+            if (index !== '' && voices[index]) {
+                selectedVoice = voices[index];
+                if (isPlaying) {
+                    stopAudio();
+                    playCurrentParagraph();
+                }
+            }
+        }
+
+        function renderChapterList() {
+            const container = document.getElementById('chapterListContainer');
+            container.innerHTML = '';
+
+            moduleChapters.forEach((ch, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left p-3 rounded-xl border transition flex items-center justify-between gap-3 ${
+                    idx === currentChapterIndex 
+                        ? 'bg-police-600 border-police-gold text-white shadow-md' 
+                        : 'bg-police-800/60 border-police-500/20 text-slate-300 hover:bg-police-600/50 hover:text-white'
+                }`;
+                btn.onclick = () => changeChapter(idx);
+
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3 truncate">
+                        <div class="w-7 h-7 rounded-lg ${idx === currentChapterIndex ? 'bg-police-gold text-police-800' : 'bg-police-700 text-police-gold'} font-bold text-xs flex items-center justify-center shrink-0">
+                            ${idx === 0 ? 'I' : idx}
+                        </div>
+                        <div class="truncate">
+                            <h4 class="text-xs font-bold truncate">${ch.title}</h4>
+                            <p class="text-[10px] text-slate-400 truncate">${ch.subtitle}</p>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-mono text-slate-400 shrink-0">${formatTime(ch.durationSec)}</span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function loadChapter(index, autoPlay = false) {
+            if (index < 0 || index >= moduleChapters.length) return;
+
+            stopAudio();
+            currentChapterIndex = index;
+            currentParagraphIndex = 0;
+            chapterElapsedTime = 0;
+
+            const ch = moduleChapters[currentChapterIndex];
+
+            document.getElementById('playerChapterTitle').textContent = ch.title;
+            document.getElementById('playerSubtitle').textContent = ch.subtitle;
+            document.getElementById('currentChapterHeading').textContent = ch.title;
+            document.getElementById('totalTimeDisplay').textContent = formatTime(ch.durationSec);
+            document.getElementById('currentTimeDisplay').textContent = "00:00";
+            document.getElementById('progressBar').style.width = '0%';
+
+            const viewport = document.getElementById('transcriptViewport');
+            viewport.innerHTML = '';
+
+            ch.paragraphs.forEach((paraText, pIdx) => {
+                const p = document.createElement('p');
+                p.id = `para-${pIdx}`;
+                p.className = 'p-3.5 rounded-xl border border-transparent transition-all duration-300 cursor-pointer hover:border-police-500/40 hover:bg-police-700/50';
+                p.style.fontSize = `${textFontSize}px`;
+                p.onclick = () => jumpToParagraph(pIdx);
+
+                p.innerHTML = `
+                    <span class="inline-block w-5 h-5 rounded-md bg-police-600 text-police-gold text-[10px] font-bold text-center leading-5 mr-2 shrink-0">
+                        ${pIdx + 1}
+                    </span>
+                    ${paraText}
+                `;
+                viewport.appendChild(p);
+            });
+
+            renderChapterList();
+
+            if (autoPlay) {
+                togglePlayPause();
+            }
+        }
+
+        function togglePlayPause() {
+            if (isPlaying) {
+                pauseAudio();
+            } else {
+                startAudio();
+            }
+        }
+
+        function startAudio() {
+            if (!speechSynth) {
+                showToast("Tu navegador no soporta voz sintética.", "fa-triangle-exclamation");
+                return;
+            }
+
+            isPlaying = true;
+            updatePlayerStateUI(true);
+            playCurrentParagraph();
+            startTimerLoop();
+        }
+
+        function pauseAudio() {
+            isPlaying = false;
+            speechSynth.pause();
+            speechSynth.cancel();
+            clearInterval(progressTimer);
+            updatePlayerStateUI(false);
+        }
+
+        function stopAudio() {
+            isPlaying = false;
+            speechSynth.cancel();
+            clearInterval(progressTimer);
+            chapterElapsedTime = 0;
+            currentParagraphIndex = 0;
+            updatePlayerStateUI(false);
+            
+            document.getElementById('currentTimeDisplay').textContent = "00:00";
+            document.getElementById('progressBar').style.width = '0%';
+            
+            document.querySelectorAll('#transcriptViewport p').forEach(p => p.classList.remove('reading-active'));
+        }
+
+        function playCurrentParagraph() {
+            const ch = moduleChapters[currentChapterIndex];
+            if (currentParagraphIndex >= ch.paragraphs.length) {
+                if (currentChapterIndex < moduleChapters.length - 1) {
+                    showToast("Siguiente lección...", "fa-forward");
+                    changeChapter(currentChapterIndex + 1, true);
+                } else {
+                    showToast("¡Módulo finalizado!", "fa-circle-check");
+                    stopAudio();
+                }
+                return;
+            }
+
+            highlightParagraph(currentParagraphIndex);
+
+            const textToRead = ch.paragraphs[currentParagraphIndex];
+            speechSynth.cancel();
+
+            currentUtterance = new SpeechSynthesisUtterance(textToRead);
+            currentUtterance.rate = playbackRate;
+
+            if (selectedVoice) {
+                currentUtterance.voice = selectedVoice;
+            }
+
+            currentUtterance.onend = () => {
+                if (isPlaying) {
+                    currentParagraphIndex++;
+                    playCurrentParagraph();
+                }
+            };
+
+            currentUtterance.onerror = () => {
+                if (isPlaying) {
+                    currentParagraphIndex++;
+                    playCurrentParagraph();
+                }
+            };
+
+            speechSynth.speak(currentUtterance);
+        }
+
+        function jumpToParagraph(pIdx) {
+            currentParagraphIndex = pIdx;
+            const ch = moduleChapters[currentChapterIndex];
+            chapterElapsedTime = Math.floor((pIdx / ch.paragraphs.length) * ch.durationSec);
+            
+            if (isPlaying) {
+                playCurrentParagraph();
+            } else {
+                highlightParagraph(pIdx);
+                startAudio();
+            }
+        }
+
+        function changeChapter(newIdx, autoPlay = true) {
+            if (newIdx >= 0 && newIdx < moduleChapters.length) {
+                loadChapter(newIdx, autoPlay);
+            }
+        }
+
+        function skipTime(seconds) {
+            const ch = moduleChapters[currentChapterIndex];
+            chapterElapsedTime = Math.max(0, Math.min(ch.durationSec, chapterElapsedTime + seconds));
+            
+            const approxParaIndex = Math.min(
+                ch.paragraphs.length - 1, 
+                Math.floor((chapterElapsedTime / ch.durationSec) * ch.paragraphs.length)
+            );
+
+            currentParagraphIndex = approxParaIndex;
+            
+            if (isPlaying) {
+                playCurrentParagraph();
+            } else {
+                highlightParagraph(currentParagraphIndex);
+                updateTimerDisplay();
+            }
+
+            showToast(`${seconds > 0 ? '+' : ''}${seconds}s`, "fa-rotate");
+        }
+
+        function setPlaybackRate(rate) {
+            playbackRate = parseFloat(rate);
+            if (isPlaying) {
+                playCurrentParagraph();
+            }
+            showToast(`Velocidad: ${playbackRate}x`, "fa-gauge-high");
+        }
+
+        function startTimerLoop() {
+            clearInterval(progressTimer);
+            progressTimer = setInterval(() => {
+                if (!isPlaying) return;
+
+                const ch = moduleChapters[currentChapterIndex];
+                if (chapterElapsedTime < ch.durationSec) {
+                    chapterElapsedTime++;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const ch = moduleChapters[currentChapterIndex];
+            document.getElementById('currentTimeDisplay').textContent = formatTime(chapterElapsedTime);
+            const percent = Math.min(100, (chapterElapsedTime / ch.durationSec) * 100);
+            document.getElementById('progressBar').style.width = `${percent}%`;
+        }
+
+        function seekByClick(event) {
+            const container = document.getElementById('progressBarContainer');
+            const rect = container.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const width = rect.width;
+            const percentage = clickX / width;
+
+            const ch = moduleChapters[currentChapterIndex];
+            chapterElapsedTime = Math.floor(percentage * ch.durationSec);
+            
+            const targetPara = Math.min(
+                ch.paragraphs.length - 1, 
+                Math.floor(percentage * ch.paragraphs.length)
+            );
+
+            currentParagraphIndex = targetPara;
+
+            if (isPlaying) {
+                playCurrentParagraph();
+            } else {
+                highlightParagraph(targetPara);
+                updateTimerDisplay();
+            }
+        }
+
+        function highlightParagraph(pIdx) {
+            document.querySelectorAll('#transcriptViewport p').forEach((p, idx) => {
+                if (idx === pIdx) {
+                    p.classList.add('reading-active');
+                    p.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    p.classList.remove('reading-active');
+                }
+            });
+        }
+
+        function updatePlayerStateUI(playing) {
+            const playIcon = document.getElementById('playIcon');
+            const statusIcon = document.getElementById('audioStatusIcon');
+            const ring = document.getElementById('artRing');
+
+            if (playing) {
+                playIcon.className = "fa-solid fa-pause";
+                statusIcon.className = "fa-solid fa-waveform text-4xl text-police-gold animate-bounce";
+                ring.classList.add('audio-wave-active');
+            } else {
+                playIcon.className = "fa-solid fa-play ml-0.5";
+                statusIcon.className = "fa-solid fa-podcast text-4xl text-police-gold";
+                ring.classList.remove('audio-wave-active');
+            }
+        }
+
+        function setFontSize(delta) {
+            textFontSize = Math.max(12, Math.min(22, textFontSize + delta));
+            document.querySelectorAll('#transcriptViewport p').forEach(p => {
+                p.style.fontSize = `${textFontSize}px`;
+            });
+            showToast(`Tamaño fuente: ${textFontSize}px`, "fa-font");
+        }
+
+        function copyTranscriptText() {
+            const ch = moduleChapters[currentChapterIndex];
+            const fullText = `${ch.title}\n${ch.subtitle}\n\n${ch.paragraphs.join('\n\n')}`;
+            
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = fullText;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+
+            showToast("Copiado al portapapeles", "fa-copy");
+        }
+
+        function toggleBookmarkCurrent() {
+            const ch = moduleChapters[currentChapterIndex];
+            showToast(`Marcador guardado: ${ch.title}`, "fa-bookmark");
+        }
+
+        function openQuizModal() {
+            quizCurrentIndex = 0;
+            quizScore = 0;
+            renderQuizQuestion();
+            document.getElementById('quickQuizModal').classList.remove('hidden');
+        }
+
+        function closeQuizModal() {
+            document.getElementById('quickQuizModal').classList.add('hidden');
+        }
+
+        function renderQuizQuestion() {
+            const qData = quizQuestions[quizCurrentIndex];
+            document.getElementById('currentQNum').textContent = quizCurrentIndex + 1;
+            document.getElementById('quizQuestion').textContent = qData.q;
+            
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+
+            const feedback = document.getElementById('quizFeedback');
+            feedback.className = 'hidden p-3 rounded-lg text-xs font-medium';
+
+            qData.options.forEach((optText, optIdx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-3 rounded-xl bg-police-800 hover:bg-police-600 border border-police-500/30 text-xs sm:text-sm font-medium transition flex items-center gap-2.5";
+                btn.innerHTML = `
+                    <span class="w-5 h-5 rounded-full bg-police-700 text-police-gold flex items-center justify-center text-[10px] font-bold border border-police-500/40">
+                        ${String.fromCharCode(65 + optIdx)}
+                    </span>
+                    <span>${optText}</span>
+                `;
+                btn.onclick = () => selectQuizAnswer(optIdx);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectQuizAnswer(selectedIndex) {
+            const qData = quizQuestions[quizCurrentIndex];
+            const feedback = document.getElementById('quizFeedback');
+            const buttons = document.querySelectorAll('#quizOptions button');
+
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selectedIndex === qData.correct) {
+                quizScore++;
+                feedback.className = "p-3 rounded-lg text-xs font-medium bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 block";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check mr-1.5"></i><strong>¡Correcto!</strong> ${qData.explanation}`;
+                buttons[selectedIndex].classList.add('bg-emerald-600/40', 'border-emerald-400');
+            } else {
+                feedback.className = "p-3 rounded-lg text-xs font-medium bg-red-500/20 border border-red-500/40 text-red-300 block";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1.5"></i><strong>Incorrecto.</strong> ${qData.explanation}`;
+                buttons[selectedIndex].classList.add('bg-red-600/40', 'border-red-400');
+                buttons[qData.correct].classList.add('bg-emerald-600/40', 'border-emerald-400');
+            }
+        }
+
+        function nextQuizQuestion() {
+            if (quizCurrentIndex < quizQuestions.length - 1) {
+                quizCurrentIndex++;
+                renderQuizQuestion();
+            } else {
+                const content = document.getElementById('quizContent');
+                content.innerHTML = `
+                    <div class="text-center py-6 space-y-3">
+                        <div class="w-16 h-16 rounded-full bg-police-gold text-police-800 flex items-center justify-center text-3xl mx-auto font-bold shadow-xl">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white">¡Autoevaluación Completada!</h4>
+                        <p class="text-sm text-slate-300">
+                            Puntaje final: <span class="font-bold text-police-gold text-base">${quizScore} de ${quizQuestions.length}</span>
+                        </p>
+                        <button onclick="openQuizModal()" class="mt-2 px-4 py-2 bg-police-gold hover:bg-police-goldHover text-police-800 font-bold text-xs rounded-lg transition">
+                            Reintentar Examen
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        function showToast(msg, iconClass = "fa-circle-check") {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastMessage').textContent = msg;
+            document.getElementById('toastIcon').className = `fa-solid ${iconClass}`;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
